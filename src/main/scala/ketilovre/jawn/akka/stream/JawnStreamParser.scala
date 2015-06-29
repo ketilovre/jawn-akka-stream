@@ -1,4 +1,4 @@
-package com.ketilovre.jawn.stream
+package ketilovre.jawn.akka.stream
 
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
@@ -8,11 +8,11 @@ class JawnStreamParser[J](mode: AsyncParser.Mode)(implicit facade: Facade[J]) {
 
   private val parserStage = new ParserStage[J](mode)
 
-  def stringFlow: Flow[String, J, Unit] = {
+  val stringFlow: Flow[String, J, Unit] = {
     Flow[String].transform(() => parserStage).mapConcat(_.toList)
   }
 
-  def byteStringFlow: Flow[ByteString, J, Unit] = {
+  val byteStringFlow: Flow[ByteString, J, Unit] = {
     Flow[ByteString].map(_.utf8String).via(stringFlow)
   }
 }

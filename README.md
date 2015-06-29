@@ -1,14 +1,15 @@
 ## jawn-akka-stream
 
-Integrates the [Jawn library](https://github.com/non/jawn) with Akka Streams, allowing you to parse
-Sources of Strings or ByteStrings into Sources of Json using Jawn's AsyncParser. Mainly intended for use with
-akka-http, as the base representation of a request body in akka-http is a `Source[ByteString, _]`.
+Integrates the [Jawn library](https://github.com/non/jawn) with Akka Streams, allowing you to transform instances of
+`Source[String, _]` or `Source[ByteString, _]` into `Source[J, _]` using Jawn's AsyncParser. Mainly intended 
+for use with akka-http, where the base representation of a request body is a `Source[ByteString, _]`.
 
 This project is currently not published anywhere, as it's a total of 55 lines of code.
 
 ### Example
 
 ```scala
+import ketilovre.jawn.akka.stream.JawnStreamParser
 
 val parser = JawnStreamParser[J](AsyncParser.UnwrapArray)
 
@@ -28,6 +29,7 @@ The parser wraps Jawn, and by extension supports any ASTs supported by Jawn.
 You can create a stream parser for any supported AST by providing an implicit `Facade[J]` when creating the parser.
 
 ```scala
+import ketilovre.jawn.akka.stream.JawnStreamParser
 import jawn.support.json4s.Parser._
 import org.json4s.JValue
 
@@ -46,7 +48,7 @@ If you're using akka-http, there is a directive which takes a `JawnStreamParser[
 body as a `Source[J, _]`.
 
 ```scala
-import com.ketilovre.jawn.http.Directives._
+import ketilovre.jawn.akka.http.Directive._
 
 val parser = JawnStreamParser[J](AsyncParser.ValueStream)
 

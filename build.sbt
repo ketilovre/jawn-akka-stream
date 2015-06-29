@@ -2,7 +2,7 @@ name := "jawn-akka-stream"
 
 version := "1.0"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
 scalacOptions ++= Seq(
   "-unchecked",
@@ -19,18 +19,24 @@ scalacOptions in Test ++= Seq(
 )
 
 resolvers ++= Seq(
-  "Scalaz Bintray" at "https://dl.bintray.com/scalaz/releases"
+  "Scalaz Bintray"    at "https://dl.bintray.com/scalaz/releases",
+  "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/"
 )
 
-libraryDependencies ++= Seq(
-  "org.spire-math" %% "jawn-ast" % "0.8.0",
-  "com.typesafe.akka" %% "akka-stream-experimental" % "1.0-RC3" % "provided",
-  "com.typesafe.akka" % "akka-http-experimental_2.11" % "1.0-RC3",
-  "com.typesafe.akka" % "akka-http-core-experimental_2.11" % "1.0-RC3",
-  "com.typesafe.akka" % "akka-http-testkit-experimental_2.11" % "1.0-RC3" % "test",
-  "org.specs2" %% "specs2-core" % "3.6" % "test",
-  "org.specs2" %% "specs2-scalacheck" % "3.6" % "test",
-  "com.typesafe.akka" % "akka-stream-testkit-experimental_2.11" % "1.0-RC3"
-)
-
-compile <<= (compile in Compile) dependsOn scapegoat
+libraryDependencies ++= {
+  val jawnV = "0.8.0"
+  val akkaStreamV = "1.0-RC4"
+  val specsV = "3.6.2"
+  Seq(
+    // ----- Jawn -----
+    "org.spire-math" %% "jawn-ast" % jawnV,
+    // ----- Akka -----
+    "com.typesafe.akka" %% "akka-stream-experimental"    % akkaStreamV % "provided",
+    "com.typesafe.akka" %% "akka-http-experimental"      % akkaStreamV % "provided",
+    "com.typesafe.akka" %% "akka-http-core-experimental" % akkaStreamV % "provided",
+    // ----- Tests -----
+    "org.specs2"        %% "specs2-core"                    % specsV      % "test",
+    "org.specs2"        %% "specs2-scalacheck"              % specsV      % "test",
+    "com.typesafe.akka" %% "akka-http-testkit-experimental" % akkaStreamV % "test"
+  )
+}

@@ -1,4 +1,4 @@
-package com.ketilovre.jawn.stream
+package ketilovre.jawn.akka.stream
 
 import akka.stream.stage.{Context, PushPullStage}
 import jawn.{AsyncParser, Facade}

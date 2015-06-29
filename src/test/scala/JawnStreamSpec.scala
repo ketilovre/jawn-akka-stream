@@ -1,10 +1,10 @@
 import akka.actor.ActorSystem
-import akka.stream.ActorFlowMaterializer
+import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
-import com.ketilovre.jawn.stream.JawnStreamParser
 import helpers.JsonGenerator
 import jawn.AsyncParser
 import jawn.ast.{JArray, JValue}
+import ketilovre.jawn.akka.stream.JawnStreamParser
 import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.ScalaCheck
 import org.specs2.concurrent.ExecutionEnv
@@ -17,7 +17,7 @@ class JawnStreamSpec extends Specification with ScalaCheck with AfterAll {
 
   implicit val ec = ac.dispatcher
 
-  implicit val afm = ActorFlowMaterializer()
+  implicit val afm = ActorMaterializer()
 
   implicit val ee = ExecutionEnv.fromExecutionContext(ec)
 
@@ -35,7 +35,7 @@ class JawnStreamSpec extends Specification with ScalaCheck with AfterAll {
 
     "SingleValue" should {
 
-      "convert a source of json chunks to a source containing a single json value" ! prop { (json: JValue, n: Int) =>
+      "convert a source of json chunks to a source containing a single json value" in prop { (json: JValue, n: Int) =>
 
         val parser = JawnStreamParser[JValue](AsyncParser.SingleValue)
 
@@ -51,7 +51,7 @@ class JawnStreamSpec extends Specification with ScalaCheck with AfterAll {
 
     "UnwrapArray" should {
 
-      "convert a source of json chunks to a source of json objects" ! prop { (json: JArray, n: Int) =>
+      "convert a source of json chunks to a source of json objects" in prop { (json: JArray, n: Int) =>
 
         val parser = JawnStreamParser[JValue](AsyncParser.UnwrapArray)
 
@@ -68,13 +68,13 @@ class JawnStreamSpec extends Specification with ScalaCheck with AfterAll {
 
     "ValueStream" should {
 
-      "convert a stream of whitespace-separated json to a source of json values" ! prop { (json: JArray, n: Int) =>
+      "convert a stream of whitespace-separated json to a source of json values" in prop { (json: JArray, n: Int) =>
 
         val parser = JawnStreamParser[JValue](AsyncParser.ValueStream)
 
-        val strings = json.vs.map(_.render()).flatMap(_.grouped(n))
+        val strings = json.vs.map(_.render() + "\n").flatMap(_.grouped(n)).toIterator
 
-        Source(() => strings.toIterator)
+        Source(() => strings)
           .via(parser.stringFlow)
           .grouped(Int.MaxValue)
           .runWith(Sink.head)
