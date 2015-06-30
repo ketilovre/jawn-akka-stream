@@ -6,7 +6,7 @@ import jawn.{AsyncParser, Facade}
 
 class JawnStreamParser[J](mode: AsyncParser.Mode)(implicit facade: Facade[J]) {
 
-  private val parserStage = new ParserStage[J](mode)
+  private def parserStage = new ParserStage[J](mode)
 
   val stringFlow: Flow[String, J, Unit] = {
     Flow[String].transform(() => parserStage).mapConcat(_.toList)

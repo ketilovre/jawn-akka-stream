@@ -1,6 +1,8 @@
 name := "jawn-akka-stream"
 
-version := "1.0"
+organization := "com.ketilovre"
+
+version := "0.1.0"
 
 scalaVersion := "2.11.7"
 

@@ -9,6 +9,7 @@ This project is currently not published anywhere, as it's a total of 55 lines of
 ### Example
 
 ```scala
+import jawn.AsyncParser
 import ketilovre.jawn.akka.stream.JawnStreamParser
 
 val parser = JawnStreamParser[J](AsyncParser.UnwrapArray)
@@ -29,8 +30,9 @@ The parser wraps Jawn, and by extension supports any ASTs supported by Jawn.
 You can create a stream parser for any supported AST by providing an implicit `Facade[J]` when creating the parser.
 
 ```scala
-import ketilovre.jawn.akka.stream.JawnStreamParser
+import jawn.AsyncParser
 import jawn.support.json4s.Parser._
+import ketilovre.jawn.akka.stream.JawnStreamParser
 import org.json4s.JValue
 
 val json4sParser = JawnStreamParser[JValue](AsyncParser.SingleValue)
@@ -42,19 +44,25 @@ val json4sParser = JawnStreamParser[JValue](AsyncParser.SingleValue)
 `SingleValue` results in a source containing a single parsed value, while `UnwrapArray` and `ValueStream` push
 elements downstream as they become available.
 
-### Directive
+### Directives
 
-If you're using akka-http, there is a directive which takes a `JawnStreamParser[J]` and extracts the request
+If you're using akka-http, there are directives which take a `JawnStreamParser[J]` and extract the request
 body as a `Source[J, _]`.
 
+`Directives.extractJson` will optimistically parse the body to Json regardless of content type.
+
+`Directives.expectJson` demands the correct content type, and will reject non-Json requests with a 
+`UnsupportedRequestContentTypeRejection`.
+
 ```scala
-import ketilovre.jawn.akka.http.Directive._
+import ...
+import ketilovre.jawn.akka.http.Directives._
 
 val parser = JawnStreamParser[J](AsyncParser.ValueStream)
 
 val route = {
   post("/") {
-    extractJson(parser) { jsonSource =>
+    expectJson(parser) { jsonSource =>
       ...
     }
   }
